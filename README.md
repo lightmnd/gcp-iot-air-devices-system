@@ -1,6 +1,6 @@
 # IoT System Documentation
 
-This documentation provides a technical overview of the IoT system built using ChatGPT, Mosquitto, Golang, and Google Kubernetes Engine (GKE). It covers the steps involved in setting up the system, including messaging infrastructure, device code, central control system, and deployment on GKE.
+This documentation provides a technical overview of the IoT system built using Mosquitto, Golang, and Google Kubernetes Engine (GKE). It covers the steps involved in setting up the system, including messaging infrastructure, device code, central control system, and deployment on GKE.
 
 ## Table of Contents
 
@@ -15,7 +15,7 @@ This documentation provides a technical overview of the IoT system built using C
 
 ## Introduction
 
-The IoT system allows for the integration of 10 devices using ChatGPT, Mosquitto, Golang, and GKE. It enables communication between devices, a central control system, and users interacting with the system through natural language. The system leverages MQTT as the messaging protocol and GKE for deployment and management.
+The IoT system allows for the integration of 10 devices using Mosquitto, Golang, and GKE. It enables communication between devices, a central control system, and users interacting with the system through natural language. The system leverages MQTT as the messaging protocol and GKE for deployment and management.
 
 ## Prerequisites
 
@@ -42,13 +42,16 @@ To set up Mosquitto on GKE, follow these steps:
 
 MQTT topics represent different types of data or actions within the IoT system. The following MQTT topics have been defined for this system:
 
-- `devices/alarm/generic`: Represents a generic alarm that devices can publish or subscribe to as a boolean value indicating the occurrence of a generic alarm.
-- `devices/alarm/logic`: Represents alarms based on logical conditions as a boolean value indicating the occurrence of alarms triggered by logical conditions.
-- `devices/temperature/ambient`: Represents ambient temperature data published by devices as floating-point values for monitoring purposes.
-- `devices/temperature/external`: Represents external temperature data published by devices as floating-point values for monitoring purposes.
-- `devices/humidity/relative`: Represents relative humidity data published by devices as floating-point values for monitoring purposes.
-- `devices/humidity/set`: Represents the desired set value for relative humidity published by devices as a floating-point value.
-- `devices/humidity/effective_set`: Represents the effective set value for relative humidity published by devices as a floating-point value.
+- `devices/alarm/generic`
+- `devices/alarm/logic`
+- `devices/temperature/ambient`
+- `devices/temperature/external`
+- `devices/humidity/relative`
+- `devices/humidity/set`
+- `devices/humidity/effective_set`
+- `...`
+
+you can see the entire list here: https://
 
 ## Writing Device Code
 
