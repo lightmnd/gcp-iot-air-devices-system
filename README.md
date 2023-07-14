@@ -51,7 +51,7 @@ MQTT topics represent different types of data or actions within the IoT system. 
 - `devices/humidity/effective_set`
 - `...`
 
-you can see the entire list here: https://
+You can see the entire list here: https://lightmnd.github.io/gcp-iot-air-devices-system/
 
 ## Writing Device Code
 
