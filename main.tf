@@ -4,7 +4,7 @@ provider "google" {
   credentials = file("path/to/google_credentials.json")
   project     = "gcp-project-id"
   region      = "us-central1"
-  zone      = "us-central1-a"
+  zone        = "us-central1-c"
 }
 
 resource "google_container_cluster" "gke_cluster" {
