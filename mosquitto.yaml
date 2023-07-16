@@ -1,0 +1,161 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mosquitto-config
+  namespace: blueteam
+data:
+  mosquitto.conf: |
+    listener 8883
+    cafile /mosquitto/certs/ca.pem
+    certfile /mosquitto/certs/server.pem
+    keyfile /mosquitto/certs/server.key
+    acl_file /mosquitto/config/acl.conf
+    allow_anonymous false
+
+    # Force TLS Version
+    tls_version tlsv1.2
+
+    require_certificate true
+    use_identity_as_username true
+
+    persistence true
+    persistence_location /mosquitto/data/
+    persistence_file mosquitto.db
+    log_dest file /mosquitto/log/mosquitto.log
+  acl.conf: |
+    pattern readwrite /eventi/%c/codice
+    pattern readwrite /eventi/%c/descrizione
+    pattern readwrite /eventi/%c/tipologia
+    pattern readwrite /remotecontrol/%c/command-remote
+    pattern readwrite $SYS/broker/connection/%c/state
+
+    user reader
+    topic read /eventi/#
+    topic read $SYS/broker/connection/#
+
+    user remotecontrol
+    topic readwrite /remotecontrol/#
+---
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: mosquitto-pv
+spec:
+  capacity:
+    storage: 10Gi
+  accessModes:
+    - ReadWriteOnce
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: standard
+  gcePersistentDisk:
+    pdName: mosquitto-disk
+    fsType: ext4
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mosquitto-pvc
+  namespace: blueteam
+  labels:
+    app: mosquitto
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+  storageClassName: standard
+  volumeName: mosquitto-pv
+
+---
+
+apiVersion: v1
+kind: Secret
+metadata:
+  name: mosquitto-certs
+  namespace: blueteam
+type: Opaque
+data:
+  ca.pem: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUQwVENDQXJtZ0F3SUJBZ0lVQU5QbjlGaTZCQklHUHlPdHRHT0dVSE9VeG1rd0RRWUpLb1pJaHZjTkFRRUwKQlFBd2NERUxNQWtHQTFVRUJoTUNTVlF4Q3pBSkJnTlZCQWdUQWxaSk1SQXdEZ1lEVlFRSEV3ZFdhV05sYm5waApNUkV3RHdZRFZRUUtFd2hDYkhWbFZHVmhiVEVPTUF3R0ExVUVDeE1GUTJ4dmRXUXhIekFkQmdOVkJBTVRGa05sCmNuUnBabWxqWVhScGIyNUJkWFJvYjNKcGRIa3dIaGNOTWpNd056RTBNRFl5TmpFMFdoY05Nek13TnpFeE1EWXkKTmpFeldqQndNUXN3Q1FZRFZRUUdFd0pKVkRFTE1Ba0dBMVVFQ0JNQ1Zra3hFREFPQmdOVkJBY1RCMVpwWTJWdQplbUV4RVRBUEJnTlZCQW9UQ0VKc2RXVlVaV0Z0TVE0d0RBWURWUVFMRXdWRGJHOTFaREVmTUIwR0ExVUVBeE1XClEyVnlkR2xtYVdOaGRHbHZia0YxZEdodmNtbDBlVENDQVNJd0RRWUpLb1pJaHZjTkFRRUJCUUFEZ2dFUEFEQ0MKQVFvQ2dnRUJBSVg3TWlMNnl0bXVYL3JIcmxSRVNxN0JNVE4zSHJodDQ3WmhvRFJZVVpqaWZBYzI1bnllSE1HagpjNjBranU4OGZ1Z2l6OUlNRE14N1ZtbGVQQ0hmTnV1T21xZUttN2M5V0ZRbkdmY1BkN2NSaEdVYjl2QUhQejdUCkJRSGRHQUJJb3RIZXYzakdjaHVwR0M5dDJIUzU4UkY2Qys4cDZFMGhwTnc1eTJFQ1BKMGJkc1gzaWl3aklpR2oKbCtQTnZQeEFBQjkzYVp2V29CQ2cyWFJGb3ovN1EyL3RVemY5N1pOalV4Uyt6M0t0Vk5XNmlkUVd4TVR5WkFsTQpPQ2s3SFpVbFhEL1FhS1lQMzlnSUdMYjlPcW8xc2NuZnpORmcxdzJCTVVtRHR0VVFyNzNNTDZ0MVVkUUU2a013CmpWU0hGYjlRWFI1RjVFeXVnTFFLK3RGSytOVExSbjBDQXdFQUFhTmpNR0V3RGdZRFZSMFBBUUgvQkFRREFnRUcKTUE4R0ExVWRFd0VCL3dRRk1BTUJBZjh3SFFZRFZSME9CQllFRkplT0x6M1QvK2R4Vkc0b0FoL1QyVkRNNEF0QwpNQjhHQTFVZEl3UVlNQmFBRkplT0x6M1QvK2R4Vkc0b0FoL1QyVkRNNEF0Q01BMEdDU3FHU0liM0RRRUJDd1VBCkE0SUJBUUJWOWRreUtXZjkreHJkdGZlUWxxbkxzWFF2NW1NZWdJL0NiZEt1Yi9ETER4dFVOQ0QxbEZtM1lzZGcKQ1oyOWx1ZWhqMVJLY1JwR0phLzJaazdMa3U2aG5TVk01WlRjakQwcXplTFY4eVc0MXJXbUoySnI4a3ZFb1hSdApIS2QrcFpQbFIxYkY5WENIZ3FKUEgvcGxTeFBWSUQyRnFBa2tCdVU4NUtjZGs3eXh4T2lDV0dEUVRmSWRCRGo5CjA3V1dxV0VkTDFJUDlDWTI4U1p1U3ljejZXN1pJMy9meTQyUG52WkhDbnE1d1hCRHZwc1pQei9tRUFDdUlqcTIKMTBFUy9STXFyWW9KdnBZakNJNk9tVVRhYlBFRk93S3VWbmIySGJyMGxxb3RncXRrWmNBMGRmNWFnR3pyS0pSYQo3SXZBU1pDOXZ2U3BJSkIvK0d5anNLeDYyYWU0Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0=
+  server.pem: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUVlekNDQTJPZ0F3SUJBZ0lVQUpXRys4bzBYdSs1WUMzaEdJRmRZblE2dDRVd0RRWUpLb1pJaHZjTkFRRUwKQlFBd2NERUxNQWtHQTFVRUJoTUNTVlF4Q3pBSkJnTlZCQWdUQWxaSk1SQXdEZ1lEVlFRSEV3ZFdhV05sYm5waApNUkV3RHdZRFZRUUtFd2hDYkhWbFZHVmhiVEVPTUF3R0ExVUVDeE1GUTJ4dmRXUXhIekFkQmdOVkJBTVRGa05sCmNuUnBabWxqWVhScGIyNUJkWFJvYjNKcGRIa3dIaGNOTWpNd056RTBNRFl6TWpNNVdoY05NalF3TnpFek1EWXoKTWpNNFdqQnpNUXN3Q1FZRFZRUUdFd0pKVkRFTE1Ba0dBMVVFQ0JNQ1Zra3hFREFPQmdOVkJBY1RCMVpwWTJWdQplbUV4RVRBUEJnTlZCQW9UQ0VKc2RXVlVaV0Z0TVE0d0RBWURWUVFMRXdWRGJHOTFaREVpTUNBR0ExVUVBeE1aCmJYRjBkQzR6TkM0eE5UUXVOVE11TWpVd0xtNXBjQzVwYnpDQ0FTSXdEUVlKS29aSWh2Y05BUUVCQlFBRGdnRVAKQURDQ0FRb0NnZ0VCQUl1dWR5SUNBUC9ub3o3Ly9STm00YXpob1lIODcxNUFnNjYxb2Q5N2Y3Vk15R3lUeitKWQp0WEpuOUhPMDFRNkRtRExMRjBjN1FzeWx1NEN1N0hTcmNHYmY4T0JmMVZTS01uOHZ2eEw0YWhFaEprY3VpYXZsCmhjRHJrQ09IR1YyQ0J1YlVDSkZHaXc3YlhzVFVoUU1KNHdrNTE5YmdIc2U0YlJIaitPTUZWL1BjWXVpK2xySWUKdk5ULzc4bjdLSG80WXNhVWFUTWM5emJkaWx2SDFtR0xtWnNzMXNOUTBPZldzTUltYThhQVZBSk9kcUhEZEYxRQpsTUF5SExzNVFhRDc5ZThwK2VHcUV4c1cya0J5K3NlWUJOM3JCRHY5LzlVOUNzQjFMQzBIdzZFeUtTWWErRVlqClh4bnZMZVFxQzBUTURrQStDbURwRTM3S3RZTWZLU2FuZWkwQ0F3RUFBYU9DQVFnd2dnRUVNQXdHQTFVZEV3RUIKL3dRQ01BQXdIUVlEVlIwT0JCWUVGS21HczFQNXBxTVY1VVd6dE4vaTVNVkVQaXdBTUI4R0ExVWRJd1FZTUJhQQpGSmVPTHozVC8rZHhWRzRvQWgvVDJWRE00QXRDTUlHTkJnZ3JCZ0VGQlFjQkFRU0JnREIrTUh3R0NDc0dBUVVGCkJ6QUNobkJvZEhSd09pOHZjSEpwZG1GMFpXTmhMV052Ym5SbGJuUXROalJoT1RabE4yVXRNREF3TUMweU1UZzEKTFdJMlpHRXROVGd5TkRJNVl6UmhOekU0TG5OMGIzSmhaMlV1WjI5dloyeGxZWEJwY3k1amIyMHZaR0kwTURWaApOV0l4TmpFeVkyVTJaakUzWkRrdlkyRXVZM0owTUNRR0ExVWRFUVFkTUJ1Q0dXMXhkSFF1TXpRdU1UVTBMalV6CkxqSTFNQzV1YVhBdWFXOHdEUVlKS29aSWh2Y05BUUVMQlFBRGdnRUJBRWNwRTFwUXFPQ25ab2N1aTE1RmsreGUKNExEcjNiTHNFNTF4TVZHcFVlRW5aQzBEdXM4UGwzWjVOTGNZM01qbURBdGkrL2MxWDdsRVlyeXEzTThrRmJDaApsbW1QWXBLczFEVlF3c2ZrZlZMTWVTTzZyZlJ3UThKU3pad0UvbFlybEZTOHdDT3c0MFlhNDUra2xPcUgyRHcrCmxOWWd4NHJDMEpvMk5yWDNzUmlPRHdxR2s1RWR0OWVyS3VMM1o1OWltcENPU1FFVmJNTkxpZUloYkdHK2lWQ1EKdG1Lc25oc2dTZ2RUeVhuRnNRRnpod2xPbzNWVFFTRy9ZZ0tDSTdoNGFLK3pMRDBuOUZrdVQ5Tm9CZzludVd6UQpqVDdZNENqNTlPQXRocVpZamJmZy85TTA1TTVqVkMwbEh4Um5NWWwxOVhKb0tBdG5OZjMxemZmVzhRU3k4em89Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0=
+  server.key: LS0tLS1CRUdJTiBQUklWQVRFIEtFWS0tLS0tCk1JSUV2Z0lCQURBTkJna3Foa2lHOXcwQkFRRUZBQVNDQktnd2dnU2tBZ0VBQW9JQkFRQ0xybmNpQWdELzU2TSsKLy8wVFp1R3M0YUdCL085ZVFJT3V0YUhmZTMrMVRNaHNrOC9pV0xWeVovUnp0TlVPZzVneXl4ZEhPMExNcGJ1QQpydXgwcTNCbTMvRGdYOVZVaWpKL0w3OFMrR29SSVNaSExvbXI1WVhBNjVBamh4bGRnZ2JtMUFpUlJvc08yMTdFCjFJVURDZU1KT2RmVzRCN0h1RzBSNC9qakJWZnozR0xvdnBheUhyelUvKy9KK3loNk9HTEdsR2t6SFBjMjNZcGIKeDlaaGk1bWJMTmJEVU5EbjFyRENKbXZHZ0ZRQ1RuYWh3M1JkUkpUQU1oeTdPVUdnKy9YdktmbmhxaE1iRnRwQQpjdnJIbUFUZDZ3UTcvZi9WUFFyQWRTd3RCOE9oTWlrbUd2aEdJMThaN3kza0tndEV6QTVBUGdwZzZSTit5cldECkh5a21wM290QWdNQkFBRUNnZ0VBQWRlcUt0dDBidXV5bjNtUXk4eFFsY2tyMU5pRE82N0ZwTDhBRDJTUWEzWmkKRTlUQTZqTHp4MGFGTzIvY3ZUTWExTU1walY4WlZZbmE5VjUwdkcyMDNMcTJYeXZjRGZXVlhnY2NweXdZa2VCMgpnNGYrVG5aby9IVjc3MXVuSms4bkJnS1NtTDBib3NxL0tSbFlvQmJ4NUNmRFBTWGtwMkNwQjNQdVBMZG9OVis3CndsMnlCRURRcU1nOW03VjN3TVh0NFduaUZsWExGakNIeWdvVWtESjVUd2d1b0lwSVVHTkRnbytkMi9qZlpnWHUKWVljZkV3N1QxTVk5UUFheUVpemdZZThPUTdRNS9NNWFNaUYrM1UzbFRRaWdUVWpQRUh6aTZYNnpPbEY3YTdFagppczZabCt3SkVVeEFmVm1mQmdwMDBsZ2l0WjMySnJKTkozNWFIQlU1Z3dLQmdRQytzQW5vUUFIMjZrcnptOWh6Cnl2R1ZRY3UybHNpdGJtRWFlemxaQnlxSlY0R01mK3A3RksxVlpsRFBjZ0R1OU84SExTaDVtRWRlWFJEYUhQUUIKNXFVT2trb3hDekFaOXFxbHY3RWtkaUhDV0xwOElHVVB0ckVNQmU5VzBDSVFmdVJJMit3LzZLV1ZvMnpGdlM2dgprR09maitrVTJiMHkzUVVHT0dMSkMyN1Izd0tCZ1FDN2hoVWxPa3djY2lUR2pTSFFoelZSK2NKZG5DSEc2R3VwCmRvak1IVzB3Z2JvOWpFakpGRUxyTTRrcWw3UE94djJ3RTJaYzhaRDJuNHpTb0YrcFRpTDB4Z1hIcXdDMXllaEUKUFJwTTJSdjRGVE1EVUorTjQ0dHlUUmYwbTMxNHpJMit2ajNxazJaM0pJbnVBWkNTd011ZnZyL3JzZFFjcmo3Two4cmR4eEdVdGN3S0JnUUNKUnBvYlJOa2xOSTQ0eWgwTlh6Q0R6eFlrb0hCZnluTEZhYWhqV3pGWUpsTHhIclZqClhnTmEwNG1oamVUMklnWmlHRFJuTlNWTDNadmdLYS9RSG9iODhudk95c3NhSmVXNzVVQlZpMlhLVDY0UTVoRmIKT3A1Q2xaTXo0Q3BsemJQeWI4Q29VWWZETGgrRVN5bHM0bm1WeVRoMjlqbXFnRXE1cTZZU0xkVGQ2UUtCZ0FzTQo3YllSNTJaTnU2a1ByQXh6eTBxWFkwTE03cGlnSGFnUTJpTGRJUkFZdFBibmkycCtEU3Q3RC93NGtGb0JFL1lLClRwL3ZoRkZrT1pJMzdTczI5WXhqRnZnYk5hR0EwblVpL0tmR3E0VkZDb3FKZDcyT3lTcmxMQ0kzLzM3YzN3VjgKaEgyTVRoOTdRYjJLemhBMzJFZ0RuNSt1RFFmYnBNdmhOYm80anBYTkFvR0JBS0pRRmJ5dTNRc0hHSkVRVHo2UwpVQUo4d25rdUhJOEtuZ1JaMWpJVnhLMTh6QWk1cCtScTRoUVRiWHRDZnhCTnpOZnprajlnb0VyK1NzZkNDZys4CmRZa2IwQXJrdHNyUExWTzV5NnNRekJiUWh2aG5MS2ZSajM4N1cwdWFKdUh2UjRjVm85UHFWZ3FZRmRWRXd5eC8KeXJIZjcvOU9tYUFNZWdWZ0JkNndEcEFPCi0tLS0tRU5EIFBSSVZBVEUgS0VZLS0tLS0=
+
+---
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mosquitto
+  namespace: blueteam
+  labels:
+    app: mosquitto
+spec:
+  selector:
+    matchLabels:
+      app: mosquitto
+      tier: frontend
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: mosquitto
+        tier: frontend
+    spec:
+      containers:
+      - image: eclipse-mosquitto:latest
+        name: mosquitto
+        resources:
+          limits:
+            cpu: "2"
+            memory: 4Gi
+          requests:
+            cpu: "0.5"
+            memory: 500Mi
+        ports:
+        - containerPort: 8883
+          name: mosquitto
+        volumeMounts:
+        - name: mosquitto-persistent-storage
+          mountPath: /mosquitto/data
+        - name: mosquitto-config
+          mountPath: /mosquitto/config/mosquitto.conf
+          subPath: mosquitto.conf
+        - name: mosquitto-config
+          mountPath: /mosquitto/config/acl.conf
+          subPath: acl.conf
+        - name: mosquitto-certs
+          mountPath: /mosquitto/certs
+          readOnly: true
+      volumes:
+      - name: mosquitto-persistent-storage
+        persistentVolumeClaim:
+          claimName: mosquitto-pvc
+      - name: mosquitto-config
+        configMap:
+          name: mosquitto-config
+      - name: mosquitto-certs
+        secret:
+          secretName: mosquitto-certs
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: mosquitto
+  namespace: blueteam
+  labels:
+    app: mosquitto
+spec:
+  ports:
+  - port: 8883
+    targetPort: 8883
+    nodePort: 31883
+  selector:
+    app: mosquitto
+    tier: frontend
+  type: LoadBalancer
+  loadBalancerIP: mosquitto-ip-statico
