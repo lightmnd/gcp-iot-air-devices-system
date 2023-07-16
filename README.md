@@ -2,6 +2,10 @@
 
 This documentation provides a technical overview of the IoT system built using Mosquitto, Golang, and Google Kubernetes Engine (GKE). It covers the steps involved in setting up the system, including messaging infrastructure, device code, central control system, and deployment on GKE.
 
+# System Diagram
+
+![alt text](system_diagram.jpeg)
+
 ## Table of Contents
 
 - [Introduction](#introduction)
