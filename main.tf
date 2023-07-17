@@ -23,8 +23,8 @@ resource "google_compute_address" "mosquitto_ip_statico" {
   region  = "europe-west8"
 }
 
-resource "google_compute_disk" "mosquitto" {
-  name  = "mosquitto"
+resource "google_compute_disk" "mosquitto-disk" {
+  name  = "mosquitto-disk"
   type  = "pd-balanced"
   size  = 10
   zone  = "europe-west8-a"
