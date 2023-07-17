@@ -79,7 +79,3 @@ For more details and customization, refer to the code snippets and explanations 
 
 This technical documentation provides an overview of the IoT system, including the steps involved and the necessary code snippets. Use this document as a guide to set up and understand the different components of the system. Adjust the code and configurations according to your specific requirements and use cases.
 
-
-[![Remote Control]
-(https://i.ytimg.com/vi/Hc79sDi3f0U/maxresdefault.jpg)]
-(https://github.com/lightmnd/gcp-iot-air-devices-system/blob/main/video-remotecontrol.mov "Remote Control") 
