@@ -79,3 +79,20 @@ For more details and customization, refer to the code snippets and explanations 
 
 This technical documentation provides an overview of the IoT system, including the steps involved and the necessary code snippets. Use this document as a guide to set up and understand the different components of the system. Adjust the code and configurations according to your specific requirements and use cases.
 
+---
+## Remote Control
+
+https://github.com/lightmnd/gcp-iot-air-devices-system/assets/19961172/1521a473-4fbc-4ea3-b269-9288c8bd19e7
+
+![screen video-remotecontrol](https://github.com/lightmnd/gcp-iot-air-devices-system/assets/19961172/717b51f8-91a2-4243-a652-204b06501a01)
+
+## Random Data
+
+https://github.com/lightmnd/gcp-iot-air-devices-system/assets/19961172/e67f1362-2bf5-49e0-aa6b-645800ac3037
+
+![data-random](https://github.com/lightmnd/gcp-iot-air-devices-system/assets/19961172/1174db44-1dcd-4d4d-941d-2302b0b62db8)
+
+
+
+
+
