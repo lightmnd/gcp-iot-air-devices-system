@@ -69,7 +69,7 @@ func main() {
 	ctx := context.Background()
 	creds := []byte(`
 	{
-
+		// Compilami :(
 	}
 	  
 	`)
