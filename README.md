@@ -92,6 +92,19 @@ https://github.com/lightmnd/gcp-iot-air-devices-system/assets/19961172/e67f1362-
 
 ![data-random](https://github.com/lightmnd/gcp-iot-air-devices-system/assets/19961172/1174db44-1dcd-4d4d-941d-2302b0b62db8)
 
+## Theoretical Costs and Cost Summary
+
+![screen con prezzo traffico su un stabilimento](https://github.com/lightmnd/gcp-iot-air-devices-system/assets/19961172/c522b06b-b910-4a18-a117-868cc024e739)
+
+![screen con prezzo traffico su 100 stabilimenti](https://github.com/lightmnd/gcp-iot-air-devices-system/assets/19961172/fd971c20-3f29-4c3b-95ea-a8dd8a86abf3)
+
+![riepilogo costi](https://github.com/lightmnd/gcp-iot-air-devices-system/assets/19961172/73ea6a6d-03a8-4b19-9d43-e33104d3d793)
+
+<img width="880" alt="price" src="https://github.com/lightmnd/gcp-iot-air-devices-system/assets/19961172/81835d04-147c-48d5-9310-0ae5c2cc811b">
+
+
+
+
 
 
 
