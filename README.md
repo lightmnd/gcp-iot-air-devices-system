@@ -79,7 +79,27 @@ For more details and customization, refer to the code snippets and explanations 
 
 This technical documentation provides an overview of the IoT system, including the steps involved and the necessary code snippets. Use this document as a guide to set up and understand the different components of the system. Adjust the code and configurations according to your specific requirements and use cases.
 
----
+## Commands
+```console
+#Credentials
+gcloud container clusters get-credentials blueteam --region europe-west8 --project blueteam-vargroup
+
+#Server
+openssl req -new -newkey rsa:2048 -nodes -keyout server.key -out server.csr -config server-gcp.conf
+
+#Clients
+openssl req -new -newkey rsa:2048 -nodes -keyout nameClient.key -out nameClient.csr 
+
+#Kubectl
+kubectl create namespace blueteam
+kubectl create quota blueteam-quota --namespace=blueteam --hard=cpu=2,memory=4Gi
+kubectl apply -f mosquitto.yaml
+kubectl autoscale deployment mosquitto --max 5 --min 1 --cpu-percent 60 -n blueteam
+
+#Base64
+echo -n 'crt' | base64 > nameCrt.crt.base64
+echo -n 'key' | base64 > nameKey.key.base64
+```
 ## Remote Control
 
 https://github.com/lightmnd/gcp-iot-air-devices-system/assets/19961172/1521a473-4fbc-4ea3-b269-9288c8bd19e7
