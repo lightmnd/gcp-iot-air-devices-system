@@ -81,6 +81,11 @@ This technical documentation provides an overview of the IoT system, including t
 
 ## Commands
 ```console
+#Terraform
+terraform init
+terraform plan
+terraform apply
+
 #Credentials
 gcloud container clusters get-credentials blueteam --region europe-west8 --project blueteam-vargroup
 
